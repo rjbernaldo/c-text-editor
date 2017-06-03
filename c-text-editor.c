@@ -14,7 +14,7 @@ void enableRawMode() {
 
   struct termios raw = orig_termios;
 
-  raw.c_lflag &= ~(ECHO); // flip bits to hide output
+  raw.c_lflag &= ~(ECHO | ICANON); // flip bits to hide output
 
   tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
 }
@@ -24,6 +24,6 @@ int main() {
 
   char c;
 
-  while (read(STDIN_FILENO, &c, 1) == 1);
+  while (read(STDIN_FILENO, &c, 1) == 1 && c != 'q');
   return 0;
 }
