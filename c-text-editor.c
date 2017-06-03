@@ -11,6 +11,13 @@
 #define APP_VERSION "0.0.1"
 #define CTRL_KEY(k) ((k) & 0x1f)
 
+enum editorKey {
+  ARROW_LEFT = 'h',
+  ARROW_DOWN = 'j',
+  ARROW_UP = 'k',
+  ARROW_RIGHT = 'l',
+};
+
 struct editorConfig {
   int cx, cy;
   int screenrows;
@@ -56,7 +63,24 @@ char editorReadKey() {
     if (nread == -1 && errno != EAGAIN) die("read");
   }
 
-  return c;
+  if (c == '\x1b') {
+    char seq[3];
+
+    if (read(STDIN_FILENO, &seq[0], 1) != 1) return '\x1b';
+    if (read(STDIN_FILENO, &seq[1], 1) != 1) return '\x1b';
+
+    if (seq[0] == '[') {
+      switch (seq[1]) {
+        case 'H': return ARROW_LEFT;
+        case 'J': return ARROW_DOWN;
+        case 'K': return ARROW_UP;
+        case 'L': return ARROW_RIGHT;
+      }
+    }
+
+  } else {
+    return c;
+  }
 }
 
 int getCursorPosition(int *rows, int *cols) {
@@ -114,16 +138,20 @@ void abFree(struct abuf *ab) {
 
 void editorMoveCursor(char key) {
   switch (key) {
-    case 'h':
+    case ARROW_LEFT:
+    // case 'h':
       E.cx--;
       break;
-    case 'j':
+    case ARROW_DOWN:
+    // case 'j':
       E.cy++;
       break;
-    case 'k':
+    case ARROW_UP:
+    // case 'k':
       E.cy--;
       break;
-    case 'l':
+    case ARROW_RIGHT:
+    // case 'l':
       E.cx++;
       break;
   }
@@ -139,10 +167,10 @@ void editorProcessKeypress() {
       exit(0);
       break;
 
-    case 'h':
-    case 'j':
-    case 'k':
-    case 'l':
+    case ARROW_LEFT:
+    case ARROW_DOWN:
+    case ARROW_UP:
+    case ARROW_RIGHT:
       editorMoveCursor(c);
   }
 }
