@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <termios.h>
 #include <errno.h>
+#include <unistd.h>
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
@@ -58,10 +59,15 @@ void editorProcessKeypress() {
   }
 }
 
+void editorRefreshScreen() {
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+}
+
 int main() {
   enableRawMode();
 
   while (1) {
+    editorRefreshScreen();
     editorProcessKeypress();
   };
 
