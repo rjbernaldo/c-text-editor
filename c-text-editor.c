@@ -112,6 +112,23 @@ void abFree(struct abuf *ab) {
   free(ab->b);
 }
 
+void editorMoveCursor(char key) {
+  switch (key) {
+    case 'h':
+      E.cx--;
+      break;
+    case 'j':
+      E.cy++;
+      break;
+    case 'k':
+      E.cy--;
+      break;
+    case 'l':
+      E.cx++;
+      break;
+  }
+}
+
 void editorProcessKeypress() {
   char c = editorReadKey();
 
@@ -122,8 +139,11 @@ void editorProcessKeypress() {
       exit(0);
       break;
 
-    default:
-      printf("%d ('%c')\r\n", c, c);
+    case 'h':
+    case 'j':
+    case 'k':
+    case 'l':
+      editorMoveCursor(c);
   }
 }
 
